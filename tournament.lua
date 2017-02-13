@@ -171,7 +171,7 @@ function pvpplus.add_to_tournament(player_name)
 	tournament.players[player_name] = true
 	tournament.sent_damages[player_name] = 0
 	tournament.received_damages[player_name] = 0
-	tournament.kills[player_names] = 0
+	tournament.kills[player_name] = 0
 
 	-- Send a chat message
 	if minetest.get_player_by_name(player_name) then

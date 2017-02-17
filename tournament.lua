@@ -131,14 +131,14 @@ function pvpplus.stop_tournament()
 		local received_damages = tostring(tournament.received_damages[v.name])
 		local kills = tostring(tournament.kills[v.name])
 
-		str = str .. "\n| "
+		local substr = "| "
 
 		local function cat_str(value, len)
-			str = str .. value
-			for n = #str, len do
-				str = str .. " "
+			substr = substr .. value
+			for n = #substr, len do
+				substr = substr .. " "
 			end
-			str = str .. "| "
+			substr = substr .. "| "
 		end
 
 		cat_str(player, 15)
@@ -147,6 +147,8 @@ function pvpplus.stop_tournament()
 		cat_str(sent_damages, 48)
 		cat_str(received_damages, 68)
 		cat_str(kills, 73)
+
+		str = str .. "\n" .. substr
 	end
 	str = str .. "\n+--------------+-------+--------+---------------+-------------------+-------+"
 
@@ -154,8 +156,8 @@ function pvpplus.stop_tournament()
 
 	local formspec = "size[8,8.5]textarea[0.5,0.5;7.5,8;ranking;Ranking;"..str.."]button_exit[3,7.5;2,1;exit;Ok]"
 	local players = minetest.get_connected_players()
-	for _, player in ipairs(players) do
-		minetest.show_formspec(player:get_player_name(), "pvpplus:ranking", formspec)
+	for name, _ in ipairs(tournament.sent_damages) do
+		minetest.show_formspec(name, "pvpplus:ranking", formspec)
 	end
 
 	-- Clean tables
@@ -364,6 +366,9 @@ minetest.register_chatcommand("tournament", {
 
 		-- Allow engaging
 		pvpplus.allow_engaging(name, param == "teleport")
+
+		-- Engage starter
+		pvpplus.engage_player(name)
 
 		-- Chat messages
 		minetest.chat_send_all("The tournament will begin in " .. tostring(tournament_starting_time).."s.")

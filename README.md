@@ -41,7 +41,6 @@ pvpplus.is_running_tournament() -- Is there a tournament currently running ?
 
 ## TODO
 
-* Using a formspec for the tournament rating
 * Add a privilege for changing PvP state
 * Add a HUD for the tournament score
 * Make the dependence to unified_inventory optional by adding chat commands to change PvP state

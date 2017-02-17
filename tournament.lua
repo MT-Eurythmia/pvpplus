@@ -118,10 +118,11 @@ function pvpplus.stop_tournament()
 	table.sort(rating, function(a, b) return a.score < b.score end)
 
 	-- Print it
-	minetest.chat_send_all("***************************** TOURNAMENT RATING *****************************")
-	minetest.chat_send_all("+--------------+-------+--------+---------------+-------------------+-------+")
-	minetest.chat_send_all("| player       | rank  | score  | sent damages  | received damages  | kills |")
-	minetest.chat_send_all("+--------------+-------+--------+---------------+-------------------+-------+")
+	-- It won't look good if the font used in the chat and the formspec textarea isn't monospace.
+	local str = "***************************** TOURNAMENT RANKING ****************************\n" ..
+	            "+--------------+-------+--------+---------------+-------------------+-------+\n" ..
+		    "| player       | rank  | score  | sent damages  | received damages  | kills |\n" ..
+	            "+--------------+-------+--------+---------------+-------------------+-------+"
 	for i, v in ipairs(rating) do
 		local player = v.name
 		local rank = tostring(i)
@@ -130,7 +131,7 @@ function pvpplus.stop_tournament()
 		local received_damages = tostring(tournament.received_damages[v.name])
 		local kills = tostring(tournament.kills[v.name])
 
-		local str = "| "
+		str = str .. "\n| "
 
 		local function cat_str(value, len)
 			str = str .. value
@@ -146,10 +147,16 @@ function pvpplus.stop_tournament()
 		cat_str(sent_damages, 48)
 		cat_str(received_damages, 68)
 		cat_str(kills, 73)
-
-		minetest.chat_send_all(str)
 	end
-	minetest.chat_send_all("+--------------+-------+--------+---------------+-------------------+-------+")
+	str = str .. "\n+--------------+-------+--------+---------------+-------------------+-------+"
+
+	minetest.chat_send_all(str)
+
+	local formspec = "size[8,8.5]textarea[0.5,0.5;7.5,8;ranking;Ranking;"..str.."]button_exit[3,7.5;2,1;exit;Ok]"
+	local players = minetest.get_connected_players()
+	for _, player in ipairs(players) do
+		minetest.show_formspec(player:get_player_name(), "pvpplus:ranking", formspec)
+	end
 
 	-- Clean tables
 	tournament = {

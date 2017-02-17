@@ -4,7 +4,9 @@ local previous_player_transfer_distance
 
 local tournament = {
 	engaging_players = false,
+	engagement_position = nil,
 	running_tournament = false,
+	teleport_immediately = false,
 	engaged_players = {},
 	players = {},
 	sent_damages = {},
@@ -15,6 +17,30 @@ local tournament = {
 function pvpplus.engage_player(player_name)
 	tournament.engaged_players[player_name] = true
 	minetest.chat_send_player(player_name, "You have been engaged for a PvP tournament!")
+
+	if tournament.engagement_position and tournament.teleport_immediately then
+		local player_obj = minetest.get_player_by_name(player_name)
+		player_obj:moveto(tournament.engagement_position)
+		-- Send a chat message
+		minetest.chat_send_player(player_name, "You've been teleported to the tournament position.")
+	end
+	return true
+end
+
+function pvpplus.disengage_player(player_name)
+	if not pvpplus.is_engaged(player_name) then
+		return false, "This player is not engaged"
+	end
+	tournament.engaged_players[player_name] = nil
+	return true
+end
+
+function pvpplus.is_engaged(player_name)
+	if tournament.engaged_players[player_name] then
+		return true
+	else
+		return false
+	end
 end
 
 function pvpplus.start_tournament(starter_name)
@@ -38,13 +64,15 @@ function pvpplus.start_tournament(starter_name)
 	for player, _ in pairs(tournament.engaged_players) do
 		 -- Enable PvPs
 		pvpplus.pvp_enable(player)
-		-- Move the the playing table
+		-- Move to the playing table
 		tournament.players[player] = true
 		tournament.sent_damages[player] = 0
 		tournament.received_damages[player] = 0
 		tournament.kills[player] = 0
 	end
 	tournament.engaged_players = {}
+	tournament.engagement_position = nil
+	tournament.teleport_immediately = false
 
 	-- Set the player transfer distance
 	previous_player_transfer_distance = minetest.setting_get("player_transfer_distance")
@@ -138,9 +166,29 @@ function pvpplus.stop_tournament()
 	minetest.setting_set("player_transfer_distance", previous_player_transfer_distance)
 end
 
-function pvpplus.allow_engaging(starter_name)
+function pvpplus.allow_engaging(starter_name, teleport)
 	tournament.engaging_players = true
 	minetest.chat_send_all(starter_name .. " opened a tournament! Type /engage to engage yourself in the tournament!")
+	if teleport then
+		tournament.engagement_position = minetest.get_player_by_name(starter_name):get_pos()
+	end
+end
+
+function pvpplus.teleport_engaged_players()
+	if not tournament.engagement_position then
+		return false, "No engagement position."
+	end
+	for player, _ in pairs(tournament.engaged_players) do
+		-- Teleport player to the starter
+		if tournament.engagement_position then
+			local player_obj = minetest.get_player_by_name(player)
+			player_obj:moveto(tournament.engagement_position)
+		end
+		-- Send a chat message
+		minetest.chat_send_player(player, "You've been teleported to the tournament position.")
+	end
+	tournament.teleport_immediately = true
+	return true
 end
 
 function pvpplus.remove_from_tournament(player_name)
@@ -295,21 +343,26 @@ minetest.register_chatcommand("engage", {
 })
 
 minetest.register_chatcommand("tournament", {
-	params = "",
-	description = "Creates a new tournament",
+	params = "[teleport]",
+	description = "Creates a new tournament, optionally teleporting players to your current position 10 seconds before the tournament starts.",
 	privs = {interact = true},
 	func = function(name, param)
+		if param ~= "" and param ~= "teleport" then
+			return false, "Invalid usage. See /help tournament."
+		end
+
 		if pvpplus.is_running_tournament() then
 			return false, "There is already a running tournament."
 		end
 
 		-- Allow engaging
-		pvpplus.allow_engaging(name)
+		pvpplus.allow_engaging(name, param == "teleport")
 
 		-- Chat messages
 		minetest.chat_send_all("The tournament will begin in " .. tostring(tournament_starting_time).."s.")
 		minetest.after(tournament_starting_time - 10, function()
 			minetest.chat_send_all("The tournament will begin in 10s! Engage yourself by typing /engage!")
+			pvpplus.teleport_engaged_players()
 		end)
 		minetest.after(tournament_starting_time - 5, function()
 			minetest.chat_send_all("The tournament will begin in 5s!")
@@ -331,6 +384,9 @@ minetest.register_on_leaveplayer(function(player)
 	local player_name = player:get_player_name()
 	if pvpplus.is_playing_tournament(player_name) then
 		pvpplus.remove_from_tournament(player_name)
+	end
+	if pvpplus.is_engaged(player_name) then
+		pvpplus.disengage_player(player_name)
 	end
 end)
 

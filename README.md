@@ -27,10 +27,12 @@ pvpplus.pvp_toggle(player_name)
 
 -- PvP tournaments:
 pvpplus.engage_player(player_name) -- Engage a player for the next tournament
+pvpplus.is_engaged(player_name) -- Is this player engaged for the next tournament ?
 pvpplus.start_tournament(starter_name) -- Start a tournament (at least 2 players have to be engaged)
 pvpplus.start_global_tournament(starter_name) -- Start a tournament engaging every connected players
 pvpplus.stop_tournament() -- Stop the current tournament
-pvpplus.allow_engaging(starter_name) -- Allow players to engage themselves by typing /engage
+pvpplus.allow_engaging(starter_name, teleport) -- Allow players to engage themselves by typing /engage. Teleport is a Boolean
+pvpplus.teleport_engaged_players() -- Teleport engaged players to the tournament position (only works if allow_engaging was called with teleport = true). Players who engage after this function has been run and before the tournament starts will be immediately teleported.
 pvpplus.remove_from_tournament(player_name) -- Remove a player from the current tournament
 pvpplus.add_to_tournament(player_name) -- Add a player to the current tournament
 pvpplus.is_playing_tournament(player_name) -- Is this player playing in the current tournament ?

@@ -118,6 +118,8 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		return false
 	end
 
+	tournament_on_punchplayer(player, hitter, damage)
+
 	local localname = player:get_player_name()
 	local hittername = hitter:get_player_name()
 
@@ -127,6 +129,4 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		minetest.chat_send_player(hittername, "The player "..localname.." does not have PvP activated.")
 		return true
 	end
-
-	tournament_on_punchplayer(player, hitter, damage)
 end)

@@ -58,6 +58,9 @@ function pvpplus.start_tournament(starter_name)
 	end
 	if count <= 1 then
 		minetest.chat_send_player(starter_name, "There are not enough engaged players to start a tournament.")
+		tournament.engaged_players = {}
+		tournament.engagement_position = nil
+		tournament.teleport_immediately = false
 		return false
 	end
 

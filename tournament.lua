@@ -118,7 +118,7 @@ function pvpplus.stop_tournament()
 			score = tournament.sent_damages[name] - tournament.received_damages[name] + tournament.kills[name] * 20
 		})
 	end
-	table.sort(rating, function(a, b) return a.score < b.score end)
+	table.sort(rating, function(a, b) return a.score > b.score end)
 
 	-- Print it
 	-- It won't look good if the font used in the chat and the formspec textarea isn't monospace.

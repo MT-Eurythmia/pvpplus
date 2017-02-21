@@ -158,8 +158,7 @@ function pvpplus.stop_tournament()
 	minetest.chat_send_all(str)
 
 	local formspec = "size[8,8.5]textarea[0.5,0.5;7.5,8;ranking;Ranking;"..str.."]button_exit[3,7.5;2,1;exit;Ok]"
-	local players = minetest.get_connected_players()
-	for name, _ in ipairs(tournament.sent_damages) do
+	for name, _ in pairs(tournament.sent_damages) do
 		minetest.show_formspec(name, "pvpplus:ranking", formspec)
 	end
 

@@ -64,6 +64,7 @@ function pvpplus.start_tournament(starter_name)
 		return false
 	end
 
+	local chat_message = "PVP TOURNAMENT BEGINS! Started by " .. starter_name .. "\nEngaged players: "
 	for player, _ in pairs(tournament.engaged_players) do
 		 -- Enable PvPs
 		pvpplus.pvp_enable(player)
@@ -72,7 +73,10 @@ function pvpplus.start_tournament(starter_name)
 		tournament.sent_damages[player] = 0
 		tournament.received_damages[player] = 0
 		tournament.kills[player] = 0
+
+		chat_message = chat_message .. player .. ", "
 	end
+	chat_message = chat_message:sub(0, -3) -- Remove the last ', '
 	tournament.engaged_players = {}
 	tournament.engagement_position = nil
 	tournament.teleport_immediately = false
@@ -81,8 +85,8 @@ function pvpplus.start_tournament(starter_name)
 	previous_player_transfer_distance = minetest.setting_get("player_transfer_distance")
 	minetest.setting_set("player_transfer_distance", 0) -- 0 = unlimited
 
-	-- Send the final chat message!
-	minetest.chat_send_all("PVP TOURNAMENT BEGINS! Started by " .. starter_name)
+	-- Send the final chat message
+	minetest.chat_send_all(chat_message)
 
 	-- Set the tournament flag
 	tournament.running_tournament = true

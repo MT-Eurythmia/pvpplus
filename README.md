@@ -17,6 +17,10 @@ Some additional commands are only executable by the players possessing the `tour
 * `/remove_from_tournament <name>`: removes a player from the current tournament
 * `/add_to_tournament <name>`: adds a player to the current tournament
 
+## Settings
+
+* `pvpplus.enable_sound_loop = true`: whether to play a looped epic music during the tournament
+
 ## API
 
 ```lua

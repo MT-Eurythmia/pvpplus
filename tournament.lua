@@ -82,14 +82,15 @@ function pvpplus.start_tournament(starter_name)
 			to_player = player,
 			gain = 1.0,
 		})
-		minetest.after(10, function(name)
-			tournament.sound_handles[name] = minetest.sound_play("pvpplus_tournament_loop", {
-				to_player = name,
-				gain = 1.0,
-				loop = true,
-			})
-		end, player)
-
+		if minetest.setting_getbool("pvpplus.enable_sound_loop") ~= false then -- If it's true or nil (unset)
+			minetest.after(10, function(name)
+				tournament.sound_handles[name] = minetest.sound_play("pvpplus_tournament_loop", {
+					to_player = name,
+					gain = 1.0,
+					loop = true,
+				})
+			end, player)
+		end
 	end
 	chat_message = chat_message:sub(0, -3) -- Remove the last ', '
 	tournament.engaged_players = {}
@@ -140,6 +141,10 @@ function pvpplus.stop_tournament()
 		if tournament.sound_handles[name] then
 			minetest.sound_stop(tournament.sound_handles[name])
 		end
+		minetest.sound_play("pvpplus_tournament_end", {
+			to_player = name,
+			gain = 1.0,
+		})
 	end
 	table.sort(rating, function(a, b) return a.score > b.score end)
 

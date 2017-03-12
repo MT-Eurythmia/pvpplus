@@ -11,7 +11,8 @@ local tournament = {
 	players = {},
 	sent_damages = {},
 	received_damages = {},
-	kills = {}
+	kills = {},
+	sound_handles = {}
 }
 
 function pvpplus.engage_player(player_name)
@@ -75,6 +76,20 @@ function pvpplus.start_tournament(starter_name)
 		tournament.kills[player] = 0
 
 		chat_message = chat_message .. player .. ", "
+
+		-- Play the sounds
+		minetest.sound_play("pvpplus_tournament_start", {
+			to_player = player,
+			gain = 1.0,
+		})
+		minetest.after(10, function(name)
+			tournament.sound_handles[name] = minetest.sound_play("pvpplus_tournament_loop", {
+				to_player = name,
+				gain = 1.0,
+				loop = true,
+			})
+		end, player)
+
 	end
 	chat_message = chat_message:sub(0, -3) -- Remove the last ', '
 	tournament.engaged_players = {}
@@ -121,6 +136,10 @@ function pvpplus.stop_tournament()
 			name = name,
 			score = tournament.sent_damages[name] - tournament.received_damages[name] + tournament.kills[name] * 20
 		})
+
+		if tournament.sound_handles[name] then
+			minetest.sound_stop(tournament.sound_handles[name])
+		end
 	end
 	table.sort(rating, function(a, b) return a.score > b.score end)
 
@@ -174,7 +193,8 @@ function pvpplus.stop_tournament()
 		players = {},
 		sent_damages = {},
 		received_damages = {},
-		kills = {}
+		kills = {},
+		sound_handles = {}
 	}
 
 	-- Change the player transfer distance back
@@ -187,6 +207,9 @@ function pvpplus.allow_engaging(starter_name, teleport)
 	if teleport then
 		tournament.engagement_position = minetest.get_player_by_name(starter_name):get_pos()
 	end
+	minetest.sound_play("pvpplus_tournament_start", {
+		gain = 1.0,
+	})
 end
 
 function pvpplus.teleport_engaged_players()

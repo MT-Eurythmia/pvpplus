@@ -46,3 +46,9 @@ pvpplus.is_running_tournament() -- Is there a tournament currently running ?
 * Make the dependence to unified_inventory optional by adding chat commands to change PvP state
 * Add a formspec for managing tournaments, accessible from the inventory
 * Testing
+
+## Sounds credits
+
+* pvpplus_tournament_start: https://freesound.org/people/anderz000/sounds/204310/
+* pvpplus_tournament_end: https://freesound.org/people/kendog88/sounds/215748/
+* pvpplus_tournament_loop: http://freesound.org/people/joshuaempyre/sounds/250856/

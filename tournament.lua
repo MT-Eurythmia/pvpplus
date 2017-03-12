@@ -166,18 +166,21 @@ function pvpplus.stop_tournament()
 
 		local function cat_str(value, len)
 			substr = substr .. value
+			if #substr > len then
+				substr = substr:sub(1, len-1) .. "+"
+			end
 			for n = #substr, len do
 				substr = substr .. " "
 			end
 			substr = substr .. "| "
 		end
 
-		cat_str(player, 15)
-		cat_str(rank, 23)
-		cat_str(score, 32)
-		cat_str(sent_damages, 48)
-		cat_str(received_damages, 68)
-		cat_str(kills, 73)
+		cat_str(player, 14)
+		cat_str(rank, 22)
+		cat_str(score, 31)
+		cat_str(sent_damages, 47)
+		cat_str(received_damages, 67)
+		cat_str(kills, 75)
 
 		str = str .. "\n" .. substr
 	end
@@ -185,7 +188,7 @@ function pvpplus.stop_tournament()
 
 	minetest.chat_send_all(str)
 
-	local formspec = "size[8,8.5]textarea[0.5,0.5;7.5,8;ranking;Ranking;"..str.."]button_exit[3,7.5;2,1;exit;Ok]"
+	local formspec = "size[10,8.5]textarea[0.5,0.5;9.5,8;ranking;Ranking;"..str.."]button_exit[4,7.5;2,1;exit;Ok]"
 	for name, _ in pairs(tournament.sent_damages) do
 		minetest.show_formspec(name, "pvpplus:ranking", formspec)
 	end

@@ -405,8 +405,6 @@ minetest.register_chatcommand("tournament", {
 			elseif params[2] ~= "" and params[2] ~= nil then
 				return false, "Invalid usage. See /help tournament."
 			end
-		else
-			return false, "Invalid usage. See /help tournament."
 		end
 
 		if pvpplus.is_running_tournament() then

@@ -8,6 +8,7 @@ local tournament = {
 	running_tournament = false,
 	teleport_immediately = false,
 	engaged_players = {},
+	previous_pvp_states = {},
 	players = {},
 	sent_damages = {},
 	received_damages = {},
@@ -68,6 +69,7 @@ function pvpplus.start_tournament(starter_name)
 	local chat_message = "PVP TOURNAMENT BEGINS! Started by " .. starter_name .. "\nEngaged players: "
 	for player, _ in pairs(tournament.engaged_players) do
 		 -- Enable PvPs
+		tournament.previous_pvp_states[player] = pvpplus.is_pvp(player)
 		pvpplus.pvp_enable(player)
 		-- Move to the playing table
 		tournament.players[player] = true
@@ -145,6 +147,9 @@ function pvpplus.stop_tournament()
 			to_player = name,
 			gain = 1.0,
 		})
+
+		-- Set PvP to the state it had before the tournament
+		pvpplus.pvp_set(name, tournament.previous_pvp_states[name])
 	end
 	table.sort(rating, function(a, b) return a.score > b.score end)
 
@@ -198,6 +203,7 @@ function pvpplus.stop_tournament()
 		engaging_players = false,
 		running_tournament = false,
 		engaged_players = {},
+		previous_pvp_states = {},
 		players = {},
 		sent_damages = {},
 		received_damages = {},

@@ -4,70 +4,68 @@ local pvptable = {}
 -- Public table, containing global functions
 pvpplus = {}
 
-function pvpplus.pvp_enable(player_name)
+function pvpplus.pvp_set(player_name, state)
+	if type(state) ~= "boolean" then
+		return false, "The state parameter has to be a boolean."
+	end
+
 	if pvpplus.is_playing_tournament(player_name) then
 		return false, "PvP state cannot be changed while playing a tournament."
 	end
 
 	local player = minetest.get_player_by_name(player_name)
-
 	pvptable[player_name] = true
 
-	minetest.chat_send_player(player_name, "You PvP has been enabled")
+	local enabled_disabled = (state and "enabled") or "disabled"
 
-	player:hud_remove(pvpdisabled)
-	player:hud_remove(nopvppic)
+	minetest.chat_send_player(player_name, "Your PvP has been " .. enabled_disabled)
 
-	pvpenabled = player:hud_add({
-		hud_elem_type = "text",
-		position = {x = 1, y = 0},
-		offset = {x=-125, y = 20},
-		scale = {x = 100, y = 100},
-		text = "PvP is enabled for you!",
-		number = 0xFF0000 -- Red
-	})
-	pvppic = player:hud_add({
-		hud_elem_type = "image",
-		position = {x = 1, y = 0},
-		offset = {x=-210, y = 20},
-		scale = {x = 1, y = 1},
-		text = "pvp.png"
-	})
+	player:hud_remove((state and pvpdisabled) or pvpenabled)
+	player:hud_remove((state and nopvppic) or pvppic)
+
+	if state then
+		pvpenabled = player:hud_add({
+			hud_elem_type = "text",
+			position = {x = 1, y = 0},
+			offset = {x=-125, y = 20},
+			scale = {x = 100, y = 100},
+			text = "PvP is enabled for you!",
+			number = 0xFF0000 -- Red
+		})
+		pvppic = player:hud_add({
+			hud_elem_type = "image",
+			position = {x = 1, y = 0},
+			offset = {x=-210, y = 20},
+			scale = {x = 1, y = 1},
+			text = "pvp.png"
+		})
+	else
+		pvpdisabled = player:hud_add({
+			hud_elem_type = "text",
+			position = {x = 1, y = 0},
+			offset = {x=-125, y = 20},
+			scale = {x = 100, y = 100},
+			text = "PvP is disabled for you!",
+			number = 0x7DC435
+		})
+		nopvppic = player:hud_add({
+			hud_elem_type = "image",
+			position = {x = 1, y = 0},
+			offset = {x = -210, y = 20},
+			scale = {x = 1, y = 1},
+			text = "nopvp.png"
+		})
+	end
 
 	return true
 end
 
+function pvpplus.pvp_enable(player_name)
+	return pvpplus.pvp_set(player_name, true)
+end
+
 function pvpplus.pvp_disable(player_name)
-	if pvpplus.is_playing_tournament(player_name) then
-		return false, "PvP state cannot be changed while playing a tournament."
-	end
-
-	player = minetest.get_player_by_name(player_name)
-
-	pvptable[player_name] = false
-
-	minetest.chat_send_player(player_name, "Your PvP has been disabled")
-
-	player:hud_remove(pvpenabled)
-	player:hud_remove(pvppic)
-
-	pvpdisabled = player:hud_add({
-		hud_elem_type = "text",
-		position = {x = 1, y = 0},
-		offset = {x=-125, y = 20},
-		scale = {x = 100, y = 100},
-		text = "PvP is disabled for you!",
-		number = 0x7DC435
-	})
-	nopvppic = player:hud_add({
-		hud_elem_type = "image",
-		position = {x = 1, y = 0},
-		offset = {x = -210, y = 20},
-		scale = {x = 1, y = 1},
-		text = "nopvp.png"
-	})
-
-	return true
+	return pvpplus.pvp_set(player_name, false)
 end
 
 function pvpplus.pvp_toggle(playername)
@@ -76,6 +74,10 @@ function pvpplus.pvp_toggle(playername)
 	else
 		return pvpplus.pvp_enable(playername)
 	end
+end
+
+function pvpplus.is_pvp(playername)
+	return pvptable[playername] or false
 end
 
 unified_inventory.register_button("pvp", {

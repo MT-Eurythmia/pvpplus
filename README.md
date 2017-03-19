@@ -25,9 +25,11 @@ Some additional commands are only executable by the players possessing the `tour
 
 ```lua
 -- Enabling/disabling PvP:
+pvpplus.pvp_set(player_name, state)
 pvpplus.pvp_enable(player_name)
 pvpplus.pvp_disable(player_name)
 pvpplus.pvp_toggle(player_name)
+pvpplus.is_pvp(player_name)
 
 -- PvP tournaments:
 pvpplus.engage_player(player_name) -- Engage a player for the next tournament

@@ -10,6 +10,9 @@ function pvpplus.pvp_set(player_name, state)
 	end
 
 	local player = minetest.get_player_by_name(player_name)
+	if not player then
+		return false, "Player " .. player_name .. " does not exist or is not currently connected."
+	end
 	pvptable[player_name] = state
 
 	local enabled_disabled = (state and "enabled") or "disabled"

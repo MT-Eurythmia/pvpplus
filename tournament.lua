@@ -149,7 +149,9 @@ function pvpplus.stop_tournament()
 		})
 
 		-- Set PvP to the state it had before the tournament
-		pvpplus.pvp_set(name, tournament.previous_pvp_states[name])
+		if tournament.previous_pvp_states[name] then
+			pvpplus.pvp_set(name, tournament.previous_pvp_states[name])
+		end
 	end
 	table.sort(rating, function(a, b) return a.score > b.score end)
 
@@ -252,6 +254,10 @@ function pvpplus.remove_from_tournament(player_name)
 		minetest.chat_send_player(player_name, "You are no longer playing the tournament.")
 	end
 	minetest.chat_send_all("Player "..player_name.." is no longer playing the tournament.")
+
+	-- Change their PvP state
+	pvpplus.pvp_set(player_name, tournament.previous_pvp_states[player_name])
+	tournament.previous_pvp_states[player_name] = nil
 
 	-- Check if the tournament is ended
 	local count = 0

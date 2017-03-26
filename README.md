@@ -34,6 +34,7 @@ pvpplus.is_pvp(player_name)
 -- PvP tournaments:
 pvpplus.engage_player(player_name) -- Engage a player for the next tournament
 pvpplus.is_engaged(player_name) -- Is this player engaged for the next tournament ?
+pvpplus.is_engaging_players() -- Is there an open tournament ?
 pvpplus.start_tournament(starter_name) -- Start a tournament (at least 2 players have to be engaged)
 pvpplus.start_global_tournament(starter_name) -- Start a tournament engaging every connected players
 pvpplus.stop_tournament() -- Stop the current tournament

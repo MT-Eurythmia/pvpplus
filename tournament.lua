@@ -17,6 +17,9 @@ local tournament = {
 }
 
 function pvpplus.engage_player(player_name)
+	if not tournament.engaging_players then
+		return false, "There is no open tournament."
+	end
 	tournament.engaged_players[player_name] = true
 	minetest.chat_send_player(player_name, "You have been engaged for a PvP tournament!")
 
@@ -43,6 +46,10 @@ function pvpplus.is_engaged(player_name)
 	else
 		return false
 	end
+end
+
+function pvpplus.is_engaging_players()
+	return tournament.engaging_players
 end
 
 function pvpplus.start_tournament(starter_name)
@@ -218,6 +225,12 @@ function pvpplus.stop_tournament()
 end
 
 function pvpplus.allow_engaging(starter_name, teleport)
+	if tournament.engaging_players then
+		return false, "There is already an open tournament."
+	end
+	if tournament.is_running_tournament then
+		return false, "There is already a running tournament."
+	end
 	tournament.engaging_players = true
 	minetest.chat_send_all(starter_name .. " opened a tournament! Type /engage to engage yourself in the tournament!")
 	if teleport then
@@ -226,6 +239,7 @@ function pvpplus.allow_engaging(starter_name, teleport)
 	minetest.sound_play("pvpplus_tournament_start", {
 		gain = 1.0,
 	})
+	return true
 end
 
 function pvpplus.teleport_engaged_players()
@@ -426,16 +440,15 @@ minetest.register_chatcommand("tournament", {
 			end
 		end
 
-		if pvpplus.is_running_tournament() then
-			return false, "There is already a running tournament."
-		end
-
 		if starting_time < 10 or starting_time > 600 then
 			return false, "Please set a starting time between 10s and 600s."
 		end
 
 		-- Allow engaging
-		pvpplus.allow_engaging(name, teleport)
+		local e, m = pvpplus.allow_engaging(name, teleport)
+		if e == false then
+			return false, m
+		end
 
 		-- Engage starter
 		pvpplus.engage_player(name)

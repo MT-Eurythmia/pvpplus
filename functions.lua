@@ -14,7 +14,7 @@ function pvpplus.pvp_set(player_name, state)
 	end
 
 	local player = minetest.get_player_by_name(player_name)
-	pvptable[player_name] = true
+	pvptable[player_name] = state
 
 	local enabled_disabled = (state and "enabled") or "disabled"
 

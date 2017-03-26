@@ -9,10 +9,6 @@ function pvpplus.pvp_set(player_name, state)
 		return false, "The state parameter has to be a boolean."
 	end
 
-	if pvpplus.is_playing_tournament(player_name) then
-		return false, "PvP state cannot be changed while playing a tournament."
-	end
-
 	local player = minetest.get_player_by_name(player_name)
 	pvptable[player_name] = state
 
@@ -84,7 +80,11 @@ unified_inventory.register_button("pvp", {
 	type = "image",
 	image = "pvp.png",
 	action = function(player)
-		pvpplus.pvp_toggle(player:get_player_name())
+		if pvpplus.is_playing_tournament(player_name) then
+			minetest.chat_send_player(player_name, "PvP state cannot be changed while playing a tournament.")
+		else
+			pvpplus.pvp_toggle(player:get_player_name())
+		end
 	end
 })
 

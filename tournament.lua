@@ -272,6 +272,10 @@ function pvpplus.add_to_tournament(player_name)
 	tournament.sent_damages[player_name] = 0
 	tournament.received_damages[player_name] = 0
 	tournament.kills[player_name] = 0
+	tournament.previous_pvp_states[player_name] = pvpplus.is_pvp(player_name)
+
+	-- Enable PvP
+	pvpplus.pvp_enable(player_name)
 
 	-- Send a chat message
 	if minetest.get_player_by_name(player_name) then

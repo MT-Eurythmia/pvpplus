@@ -65,7 +65,7 @@ function pvpplus.start_tournament(starter_name)
 	for _, _ in pairs(tournament.engaged_players) do
 		count = count + 1
 	end
-	if count <= 1 then
+	if count <= 1 and not pvpplus.debug then
 		minetest.chat_send_player(starter_name, "There are not enough engaged players to start a tournament.")
 		tournament.engaged_players = {}
 		tournament.engagement_position = nil
@@ -487,7 +487,21 @@ end)
 
 minetest.register_on_dieplayer(function(player)
 	local player_name = player:get_player_name()
-	if pvpplus.is_playing_tournament(player_name) then
-		pvpplus.remove_from_tournament(player_name)
+	if not pvpplus.is_playing_tournament(player_name) then
+		return
+	end
+
+	pvpplus.remove_from_tournament(player_name)
+
+	local pos = vector.round(player:getpos())
+	if minetest.get_modpath("bones") and minetest.get_node(pos).name == "bones:bones" then
+		local bones_inv = minetest.get_inventory({type="node", pos=pos})
+		local player_inv = player:get_inventory()
+		if not player_inv:is_empty("main") then
+			minetest.chat_send_player(player_name, "Cannot give you back your stuff because your inventory is not empty. Your stuff is still is your bones.")
+			return
+		end
+		player_inv:set_list("main", bones_inv:get_list("main"))
+		minetest.remove_node(pos)
 	end
 end)

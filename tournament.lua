@@ -13,7 +13,8 @@ local tournament = {
 	sent_damages = {},
 	received_damages = {},
 	kills = {},
-	sound_handles = {}
+	sound_handles = {},
+	starting_infos = {starter = nil, open_time = nil, start_time = nil, initially_engaged_players = nil},
 }
 
 function pvpplus.engage_player(player_name)
@@ -52,7 +53,7 @@ function pvpplus.is_engaging_players()
 	return tournament.engaging_players
 end
 
-function pvpplus.start_tournament(starter_name)
+function pvpplus.start_tournament()
 	if tournament.running_tournament then
 		minetest.chat_send_player(starter_name, "There is already a running tournament.")
 		return false
@@ -66,16 +67,19 @@ function pvpplus.start_tournament(starter_name)
 		count = count + 1
 	end
 	if count <= 1 and not pvpplus.debug then
-		minetest.chat_send_player(starter_name, "There are not enough engaged players to start a tournament.")
+		minetest.chat_send_all("There are not enough engaged players to start a tournament.")
 		tournament.engaged_players = {}
 		tournament.engagement_position = nil
 		tournament.teleport_immediately = false
 		return false
 	end
 
-	local chat_message = "PVP TOURNAMENT BEGINS! Started by " .. starter_name .. "\nEngaged players: "
+	local chat_message = "PVP TOURNAMENT BEGINS! Started by " .. (tournament.starting_infos.starter or "[unknown player]") .. "\nEngaged players: "
+	tournament.starting_infos.initially_engaged_players = {}
 	for player, _ in pairs(tournament.engaged_players) do
-		 -- Enable PvPs
+		tournament.starting_infos.initially_engaged_players[player] = true
+
+		-- Enable PvPs
 		tournament.previous_pvp_states[player] = pvpplus.is_pvp(player)
 		pvpplus.pvp_enable(player)
 		-- Move to the playing table
@@ -117,7 +121,7 @@ function pvpplus.start_tournament(starter_name)
 	tournament.running_tournament = true
 end
 
-function pvpplus.start_global_tournament(starter_name)
+function pvpplus.start_global_tournament()
 	local players = minetest.get_connected_players()
 
 	-- Engage all connected players
@@ -129,7 +133,7 @@ function pvpplus.start_global_tournament(starter_name)
 	end
 
 	-- Start the tournament
-	pvpplus.start_tournament(starter_name)
+	pvpplus.start_tournament()
 end
 
 function pvpplus.stop_tournament()
@@ -217,7 +221,8 @@ function pvpplus.stop_tournament()
 		sent_damages = {},
 		received_damages = {},
 		kills = {},
-		sound_handles = {}
+		sound_handles = {},
+		starting_infos = {starter = nil, open_time = nil, start_time = nil, initially_engaged_players = nil},
 	}
 
 	-- Change the player transfer distance back
@@ -343,7 +348,12 @@ minetest.register_chatcommand("start_global_tournament", {
 	description = "Start a PvP tournament engaging every connected players and starting immediately",
 	privs = {interact = true, tournament_mod = true},
 	func = function(name, param)
-		pvpplus.start_global_tournament(name)
+		-- Fill start infos
+		tournament.starting_infos.starter = name
+		tournament.starting_infos.open_time = nil
+		tournament.starting_infos.start_time = os.time()
+
+		pvpplus.start_global_tournament()
 		return true
 	end
 })
@@ -444,6 +454,11 @@ minetest.register_chatcommand("tournament", {
 			return false, "Please set a starting time between 10s and 600s."
 		end
 
+		-- Fill start infos
+		tournament.starting_infos.starter = name
+		tournament.starting_infos.open_time = os.time()
+		tournament.starting_infos.start_time = os.time() + starting_time
+
 		-- Allow engaging
 		local e, m = pvpplus.allow_engaging(name, teleport)
 		if e == false then
@@ -472,6 +487,47 @@ minetest.register_chatcommand("tournament", {
 		minetest.after(starting_time, function(name)
 			pvpplus.start_tournament(name)
 		end, name)
+	end
+})
+
+minetest.register_chatcommand("tournament_info", {
+	params = "",
+	description = "Prints tournament informations",
+	privs = {},
+	func = function(name, param)
+		if pvpplus.is_engaging_players() then
+			local str = "There is an open tournament which is not yet started (you can engage for this tournament by typing /engage).\n" ..
+			            "The tournament was open by: " .. tournament.starting_infos.starter ..
+			            "\nThe tournament will start in: " .. os.difftime(tournament.starting_infos.start_time, os.time()) .. " seconds\n" ..
+				    "The tournament is open since: " .. os.date("%c", tournament.starting_infos.open_time) ..
+				    (tournament.engagement_position and "\nEngaged players will be teleported before the tournament starts.\n" or "\nEngaged players won't be teleported.\n") ..
+				    "Currently engaged players are: "
+			for player, _ in pairs(tournament.engaged_players) do
+				str = str .. player .. ", "
+			end
+			str = str:sub(0, -3)
+
+			return true, str
+		elseif pvpplus.is_running_tournament() then
+			local str = "There is a currrently running tournament.\n" ..
+			            "The tournament was open by: " .. tournament.starting_infos.starter ..
+			            "\nThe tournament is running since: " .. os.date("%c", tournament.starting_infos.start_time) ..
+				    "\nInitially engaged players were: "
+			for player, _ in pairs(tournament.starting_infos.initially_engaged_players) do
+				str = str .. player .. ", "
+			end
+			str = str:sub(0, -3)
+
+			str = str .. "\nRemaining players are: "
+			for player, _ in pairs(tournament.players) do
+				str = str .. player .. ", "
+			end
+			str = str:sub(0, -3)
+
+			return true, str
+		else
+			return true, "There is no currently running tournament. You can start a new tournament by using /tournament (see /help tournament)."
+		end
 	end
 })
 

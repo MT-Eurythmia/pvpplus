@@ -9,7 +9,8 @@ PvP can be enabled/disabled from the inventory.
 
 A new tournament can be initiated by a player by typing /tournament.
 Then, each playing wanting to play in the tournament has to type /engage during the next minute (this delay is customizable using the `pvpplus.tournament_starting_time` setting, specified in seconds).
-Any engaged player can leave the current tournament by using `/leave_tournament`.
+Any engaged player can leave the current tournament by using `/leave_tournament`.  
+Varions infos about the current tournament can be seen using `/tournament_info`.
 
 Some additional commands are only executable by the players possessing the `tournament_mod` privilege:
 * `/start_global_tournament`: immediately starts a tournament engaging every connected players (except those who don't have the interact privilege)

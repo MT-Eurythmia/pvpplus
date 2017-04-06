@@ -55,8 +55,10 @@ end
 
 function pvpplus.start_tournament()
 	if tournament.running_tournament then
-		minetest.chat_send_player(starter_name, "There is already a running tournament.")
-		return false
+		if tournament.starting_infos.starter then
+			minetest.chat_send_player(tournament.starting_infos.starter, "There is already a running tournament.")
+		end
+		return false, "There is already a running tournament."
 	end
 
 	-- Stop engaging

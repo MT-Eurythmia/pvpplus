@@ -427,7 +427,7 @@ minetest.register_chatcommand("engage", {
 })
 
 minetest.register_chatcommand("tournament", {
-	params = "[teleport] [seconds]",
+	params = "[noteleport] [seconds]",
 	description = "Creates a new tournament, optionally teleporting players to your current position 10 seconds before the tournament starts.",
 	privs = {interact = true},
 	func = function(name, param)
@@ -436,11 +436,11 @@ minetest.register_chatcommand("tournament", {
 			return false, "Invalid usage. See /help tournament."
 		end
 		local starting_time = tournament_starting_time
-		local teleport = false
+		local teleport = true
 		if tonumber(params[1]) then
 			starting_time = tonumber(params[1])
-		elseif params[1] == "teleport" then
-			teleport = true
+		elseif params[1] == "noteleport" then
+			teleport = false
 			if tonumber(params[2]) then
 				starting_time = tonumber(params[2])
 			elseif params[2] ~= "" and params[2] ~= nil then

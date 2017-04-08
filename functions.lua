@@ -81,10 +81,11 @@ unified_inventory.register_button("pvp", {
 	type = "image",
 	image = "pvp.png",
 	action = function(player)
+		local player_name = player:get_player_name()
 		if pvpplus.is_playing_tournament(player_name) then
 			minetest.chat_send_player(player_name, "PvP state cannot be changed while playing a tournament.")
 		else
-			pvpplus.pvp_toggle(player:get_player_name())
+			pvpplus.pvp_toggle(player_name)
 		end
 	end
 })

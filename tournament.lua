@@ -55,9 +55,6 @@ end
 
 function pvpplus.start_tournament()
 	if tournament.running_tournament then
-		if tournament.starting_infos.starter then
-			minetest.chat_send_player(tournament.starting_infos.starter, "There is already a running tournament.")
-		end
 		return false, "There is already a running tournament."
 	end
 
@@ -135,7 +132,7 @@ function pvpplus.start_global_tournament()
 	end
 
 	-- Start the tournament
-	pvpplus.start_tournament()
+	return pvpplus.start_tournament()
 end
 
 function pvpplus.stop_tournament()
@@ -355,8 +352,7 @@ minetest.register_chatcommand("start_global_tournament", {
 		tournament.starting_infos.open_time = nil
 		tournament.starting_infos.start_time = os.time()
 
-		pvpplus.start_global_tournament()
-		return true
+		return pvpplus.start_global_tournament()
 	end
 })
 
@@ -487,7 +483,10 @@ minetest.register_chatcommand("tournament", {
 
 		-- Start tournament
 		minetest.after(starting_time, function(name)
-			pvpplus.start_tournament(name)
+			local ok, e = pvpplus.start_tournament()
+			if ok == false and e then
+				minetest.chat_send_player(name, e)
+			end
 		end, name)
 	end
 })

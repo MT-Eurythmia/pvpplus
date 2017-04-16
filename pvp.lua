@@ -77,16 +77,41 @@ function pvpplus.is_pvp(playername)
 	return pvptable[playername].state or false
 end
 
-unified_inventory.register_button("pvp", {
-	type = "image",
-	image = "pvp.png",
-	action = function(player)
-		local player_name = player:get_player_name()
-		if pvpplus.is_playing_tournament(player_name) then
-			minetest.chat_send_player(player_name, "PvP state cannot be changed while playing a tournament.")
-		else
-			pvpplus.pvp_toggle(player_name)
+if minetest.get_modpath("unified_inventory") then
+	unified_inventory.register_button("pvp", {
+		type = "image",
+		image = "pvp.png",
+		action = function(player)
+			local player_name = player:get_player_name()
+			if pvpplus.is_playing_tournament(player_name) then
+				minetest.chat_send_player(player_name, "PvP state cannot be changed while playing a tournament.")
+			else
+				pvpplus.pvp_toggle(player_name)
+			end
 		end
+	})
+end
+
+minetest.register_chatcommand("pvp_enable", {
+	params = "",
+	description = "Enables PvP",
+	privs = {},
+	func = function(name, param)
+		if pvpplus.is_pvp(name) then
+			return false, "Your PvP is already enabled."
+		end
+		return pvpplus.pvp_enable(name)
+	end
+})
+minetest.register_chatcommand("pvp_disable", {
+	params = "",
+	description = "Disables PvP",
+	privs = {},
+	func = function(name, param)
+		if not pvpplus.is_pvp(name) then
+			return false, "Your PvP is already disabled."
+		end
+		return pvpplus.pvp_disable(name)
 	end
 })
 

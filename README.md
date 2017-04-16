@@ -5,7 +5,7 @@ Some code and images are from the PvP-Button Mod by Phiwari123.
 
 ## Usage
 
-PvP can be enabled/disabled from the inventory.
+PvP can be enabled/disabled from the inventory, or using the commands `/pvp_enable` and `/pvp_disable`.
 
 A new tournament can be initiated by a player by typing /tournament.
 Then, each playing wanting to play in the tournament has to type /engage during the next minute (this delay is customizable using the `pvpplus.tournament_starting_time` setting, specified in seconds).
@@ -56,7 +56,6 @@ pvpplus.tournament_hud_update_all() -- Update the list and all player HUDs
 ## TODO
 
 * Add a privilege for changing PvP state
-* Make the dependence to unified_inventory optional by adding chat commands to change PvP state
 * Add a formspec for managing tournaments, accessible from the inventory
 * Testing
 

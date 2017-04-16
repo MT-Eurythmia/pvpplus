@@ -90,10 +90,14 @@ unified_inventory.register_button("pvp", {
 	end
 })
 
+------ Load tournaments ------
 dofile(minetest.get_modpath(minetest.get_current_modname()).."/tournament.lua")
+------------------------------
+
 -- Make these functions private
 local tournament_on_punchplayer = pvpplus.tournament_on_punchplayer
 pvpplus.tournament_on_punchplayer = nil
+
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()

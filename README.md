@@ -45,12 +45,17 @@ pvpplus.remove_from_tournament(player_name) -- Remove a player from the current 
 pvpplus.add_to_tournament(player_name) -- Add a player to the current tournament
 pvpplus.is_playing_tournament(player_name) -- Is this player playing in the current tournament ?
 pvpplus.is_running_tournament() -- Is there a tournament currently running ?
+pvpplus.get_score(player_name) -- Returns the player current score
+
+-- Tournaments HUD:
+pvpplus.tournament_hud_update_list() -- Updates the player list, as shown in the HUD
+pvpplus.tournament_hud_update(player[, update_list]) -- Updates a player HUD, optionnaly updating the list (the default for update_list is true)
+pvpplus.tournament_hud_update_all() -- Update the list and all player HUDs
 ```
 
 ## TODO
 
 * Add a privilege for changing PvP state
-* Add a HUD for the tournament score
 * Make the dependence to unified_inventory optional by adding chat commands to change PvP state
 * Add a formspec for managing tournaments, accessible from the inventory
 * Testing

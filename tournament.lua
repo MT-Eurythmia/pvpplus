@@ -53,6 +53,13 @@ function pvpplus.is_engaging_players()
 	return tournament.engaging_players
 end
 
+function pvpplus.get_score(name)
+	if not pvpplus.is_running_tournament() then
+		return false, "There is no running tournament."
+	end
+	return tournament.sent_damages[name] - tournament.received_damages[name] + tournament.kills[name] * 20
+end
+
 function pvpplus.start_tournament()
 	if tournament.running_tournament then
 		return false, "There is already a running tournament."
@@ -75,6 +82,7 @@ function pvpplus.start_tournament()
 
 	local chat_message = "PVP TOURNAMENT BEGINS! Started by " .. (tournament.starting_infos.starter or "[unknown player]") .. "\nEngaged players: "
 	tournament.starting_infos.initially_engaged_players = {}
+
 	for player, _ in pairs(tournament.engaged_players) do
 		tournament.starting_infos.initially_engaged_players[player] = true
 
@@ -116,6 +124,9 @@ function pvpplus.start_tournament()
 	-- Send the final chat message
 	minetest.chat_send_all(chat_message)
 
+	-- Update HUDs
+	pvpplus.tournament_hud_update_all()
+
 	-- Set the tournament flag
 	tournament.running_tournament = true
 end
@@ -127,7 +138,7 @@ function pvpplus.start_global_tournament()
 	for _, player in ipairs(players) do
 		local player_name = player:get_player_name()
 		if minetest.get_player_privs(player_name).interact then -- Well, don't engage players who don't have interact.
-			pvpplus.engage_player(player:get_player_name())
+			pvpplus.engage_player(player_name)
 		end
 	end
 
@@ -147,7 +158,7 @@ function pvpplus.stop_tournament()
 	for name, _ in pairs(tournament.sent_damages) do
 		table.insert(rating, {
 			name = name,
-			score = tournament.sent_damages[name] - tournament.received_damages[name] + tournament.kills[name] * 20
+			score = pvpplus.get_score(name)
 		})
 
 		if tournament.sound_handles[name] then
@@ -161,6 +172,11 @@ function pvpplus.stop_tournament()
 		-- Set PvP to the state it had before the tournament
 		if tournament.previous_pvp_states[name] then
 			pvpplus.pvp_set(name, tournament.previous_pvp_states[name])
+		end
+
+		local player = minetest.get_player_by_name(name)
+		if player then
+			pvpplus.tournament_hud_clear(player)
 		end
 	end
 	table.sort(rating, function(a, b) return a.score > b.score end)
@@ -283,11 +299,14 @@ function pvpplus.remove_from_tournament(player_name)
 
 	if count <= 1 then -- 1 or less remaining players
 		pvpplus.stop_tournament()
+	else
+		pvpplus.tournament_hud_update_all()
 	end
 end
 
 function pvpplus.add_to_tournament(player_name)
-	if not pvpplus.is_running_tournament() or pvpplus.is_playing_tournament(player_name) then
+	local player = minetest.get_player_by_name(player_name)
+	if not pvpplus.is_running_tournament() or pvpplus.is_playing_tournament(player_name) or not player then
 		return false
 	end
 
@@ -302,10 +321,10 @@ function pvpplus.add_to_tournament(player_name)
 	pvpplus.pvp_enable(player_name)
 
 	-- Send a chat message
-	if minetest.get_player_by_name(player_name) then
-		minetest.chat_send_player(player_name, "You joined the current tournament!")
-	end
+	minetest.chat_send_player(player_name, "You joined the current tournament!")
 	minetest.chat_send_all("Player "..player_name.." joined the current tournament!")
+
+	pvpplus.tournament_hud_update_all()
 end
 
 function pvpplus.is_playing_tournament(player_name)
@@ -336,7 +355,9 @@ function pvpplus.tournament_on_punchplayer(player, hitter, damage)
 	if player:get_hp() - damage <= 0 then -- Killed
 		tournament.kills[hitter_name] = tournament.kills[hitter_name] + 1
 		minetest.chat_send_player(player_name, "You have been killed by " .. hitter_name)
-		-- Removing the player from the tournament is done by the on_dieplayer callback.
+		-- Removing the player from the tournament and updating HUDs is done by the on_dieplayer callback.
+	else
+		pvpplus.tournament_hud_update_all()
 	end
 end
 
@@ -372,3 +393,4 @@ minetest.register_on_dieplayer(function(player)
 end)
 
 dofile(minetest.get_modpath(minetest.get_current_modname()).."/tournament_commands.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()).."/tournament_hud.lua")

@@ -96,9 +96,9 @@ local tournament_on_punchplayer = pvpplus.tournament_on_punchplayer
 pvpplus.tournament_on_punchplayer = nil
 
 minetest.register_on_joinplayer(function(player)
-	localname = player:get_player_name()
-	pvptable[localname] = {state = false}
-	pvptable[localname].nopvppic = player:hud_add({
+	local name = player:get_player_name()
+	pvptable[name] = {state = false}
+	pvptable[name].nopvppic = player:hud_add({
 		hud_elem_type = "image",
 		position = {x = 1, y = 0},
 		offset = {x = -210, y = 20},
@@ -106,7 +106,7 @@ minetest.register_on_joinplayer(function(player)
 		text = "nopvp.png"
 	})
 
-	pvptable[localname].pvpdisabled = player:hud_add({
+	pvptable[name].pvpdisabled = player:hud_add({
 		hud_elem_type = "text",
 		position = {x = 1, y = 0},
 		offset = {x=-125, y = 20},

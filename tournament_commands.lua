@@ -13,7 +13,7 @@ minetest.register_chatcommand("start_global_tournament", {
 		tournament.starting_infos.open_time = nil
 		tournament.starting_infos.start_time = os.time()
 
-		return pvpplus.start_global_tournament()
+		return pvpplus.start_global_tournament(name)
 	end
 })
 

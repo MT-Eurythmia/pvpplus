@@ -131,10 +131,11 @@ function pvpplus.start_tournament()
 	tournament.running_tournament = true
 end
 
-function pvpplus.start_global_tournament()
+function pvpplus.start_global_tournament(starter_name)
 	local players = minetest.get_connected_players()
 
 	-- Engage all connected players
+	pvpplus.allow_engaging(starter_name)
 	for _, player in ipairs(players) do
 		local player_name = player:get_player_name()
 		if minetest.get_player_privs(player_name).interact then -- Well, don't engage players who don't have interact.

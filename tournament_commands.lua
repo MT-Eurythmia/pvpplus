@@ -3,6 +3,16 @@ local tournament = pvpplus.tournament -- Shortcut reference
 
 minetest.register_privilege("tournament_mod", "PvP Tournament Moderator")
 
+local function check_permission(name)
+	if minetest.get_player_privs(name).tournament_mod then
+		return true
+	end
+	if (tournament.starting_infos.starter or "") == name then
+		return true
+	end
+	return false
+end
+
 minetest.register_chatcommand("start_global_tournament", {
 	params = "",
 	description = "Start a PvP tournament engaging every connected players and starting immediately",
@@ -20,8 +30,11 @@ minetest.register_chatcommand("start_global_tournament", {
 minetest.register_chatcommand("stop_tournament", {
 	params = "",
 	description = "Stops the current PvP tournament",
-	privs = {interact = true, tournament_mod = true},
+	privs = {interact = true},
 	func = function(name, param)
+		if not check_permission(name) then
+			return false, "You have no permission to stop this tournament."
+		end
 		pvpplus.stop_tournament()
 		return true
 	end
@@ -30,8 +43,11 @@ minetest.register_chatcommand("stop_tournament", {
 minetest.register_chatcommand("remove_from_tournament", {
 	params = "<name>",
 	description = "Removes a player from a PvP tournament",
-	privs = {interact = true, tournament_mod = true},
+	privs = {interact = true},
 	func = function(name, param)
+		if not check_permission(name) then
+			return false, "You have no permission to remove a player from this tournament."
+		end
 		if not minetest.get_player_by_name(param) then
 			return false, "Player does not exist. Please refer to usage: /help kick_from_tournament"
 		end
@@ -43,8 +59,11 @@ minetest.register_chatcommand("remove_from_tournament", {
 minetest.register_chatcommand("add_to_tournament", {
 	params = "<name>",
 	description = "Adds a player to the current tournament",
-	privs = {interact = true, tournament_mod = true},
+	privs = {interact = true},
 	func = function(name, param)
+		if not check_permission(name) then
+			return false, "You have no permission to add a player to this tournament."
+		end
 		if not minetest.get_player_by_name(param) then
 			return false, "Player does not exist. Please refer to usage: /help kick_from_tournament"
 		end

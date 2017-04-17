@@ -175,10 +175,11 @@ minetest.register_chatcommand("tournament_music_toggle", {
 -- value: {[bool: whether the parameter requires the tournament_mod privilege], [string: type of the wanted value (number or string), nil if no value]}
 local param_list = {
 	noteleport = {false, nil},
-	start_delay = {false, "number"}
+	start_delay = {false, "number"},
+	broadcast = {true, nil},
 }
 
-local function parse_params(param)
+local function parse_params(param, name)
 	local params = param:split(" ")
 	local param_table = {}
 	for _, param in ipairs(params) do
@@ -218,13 +219,13 @@ local function parse_params(param)
 end
 
 minetest.register_chatcommand("tournament", {
-	params = "[noteleport] [start_delay=<seconds>]",
+	params = "[noteleport] [broadcast] [start_delay=<seconds>]",
 	description = "Creates a new tournament, optionally teleporting players to your current position 10 seconds before the tournament starts.",
 	privs = {interact = true},
 	func = function(name, param)
 		local params
 		do
-			local ok, res = parse_params(param)
+			local ok, res = parse_params(param, name)
 			if ok == false then
 				return false, res
 			end
@@ -236,6 +237,7 @@ minetest.register_chatcommand("tournament", {
 			return false, "Please set a start delay between 10s and 600s."
 		end
 		local teleport = params.noteleport ~= true
+		tournament.broadcast_messages = params.broadcast or false
 
 		-- Fill start infos
 		tournament.starting_infos.starter = name
@@ -252,17 +254,18 @@ minetest.register_chatcommand("tournament", {
 		pvpplus.engage_player(name)
 
 		-- Chat messages
-		minetest.chat_send_all("The tournament will begin in " .. tostring(starting_time).."s.")
+		local chat_send = (params.broadcast and minetest.chat_send_all) or pvpplus.chat_send_tournament
+		minetest.chat_send_all("The tournament will begin in " .. tostring(starting_time).."s.") -- First chat message is always broadcasted
 		minetest.after(starting_time - 10, function()
-			minetest.chat_send_all("The tournament will begin in 10s! Engage yourself by typing /engage!")
+			pvpplus.chat_send_tournament("The tournament will begin in 10s! Engage yourself by typing /engage!", true)
 			pvpplus.teleport_engaged_players()
 		end)
 		minetest.after(starting_time - 5, function()
-			minetest.chat_send_all("The tournament will begin in 5s!")
+			pvpplus.chat_send_tournament("The tournament will begin in 5s!", true)
 		end)
 		for i = 1, 4 do
 			minetest.after(starting_time - i, function()
-				minetest.chat_send_all(tostring(i).."!")
+				pvpplus.chat_send_tournament(tostring(i).."!", true)
 			end)
 		end
 

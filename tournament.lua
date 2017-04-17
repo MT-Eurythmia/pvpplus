@@ -13,6 +13,7 @@ pvpplus.tournament = {
 	kills = {},
 	sound_handles = {},
 	starting_infos = {starter = nil, open_time = nil, start_time = nil, initially_engaged_players = nil},
+	broadcast_messages = false,
 }
 
 local tournament = pvpplus.tournament -- Shortcut reference
@@ -60,25 +61,45 @@ function pvpplus.get_score(name)
 	return tournament.sent_damages[name] - tournament.received_damages[name] + tournament.kills[name] * 20
 end
 
+function pvpplus.chat_send_tournament(msg, allow_broadcast)
+	if tournament.broadcast_messages and allow_broadcast then
+		minetest.chat_send_all(msg)
+		return false
+	elseif pvpplus.is_running_tournament() then
+		for name, _ in pairs(tournament.sent_damages) do
+			minetest.chat_send_player(name, msg)
+		end
+		return true
+	elseif pvpplus.is_engaging_players() then
+		for name, _ in pairs(tournament.engaged_players) do
+			minetest.chat_send_player(name, msg)
+		end
+		return true
+	else
+		return false
+	end
+end
+
 function pvpplus.start_tournament()
 	if tournament.running_tournament then
 		return false, "There is already a running tournament."
 	end
-
-	-- Stop engaging
-	tournament.engaging_players = false
 
 	local count = 0
 	for _, _ in pairs(tournament.engaged_players) do
 		count = count + 1
 	end
 	if count <= 1 and not pvpplus.debug then
-		minetest.chat_send_all("There are not enough engaged players to start a tournament.")
+		pvpplus.chat_send_tournament("There are not enough engaged players to start a tournament.", true)
 		tournament.engaged_players = {}
 		tournament.engagement_position = nil
 		tournament.teleport_immediately = false
+		tournament.engaging_players = false
 		return false
 	end
+
+	-- Stop engaging
+	tournament.engaging_players = false
 
 	local chat_message = "PVP TOURNAMENT BEGINS! Started by " .. (tournament.starting_infos.starter or "[unknown player]") .. "\nEngaged players: "
 	tournament.starting_infos.initially_engaged_players = {}
@@ -122,13 +143,13 @@ function pvpplus.start_tournament()
 	minetest.setting_set("player_transfer_distance", 0) -- 0 = unlimited
 
 	-- Send the final chat message
-	minetest.chat_send_all(chat_message)
-
-	-- Update HUDs
-	pvpplus.tournament_hud_update_all()
+	pvpplus.chat_send_tournament(chat_message, true)
 
 	-- Set the tournament flag
 	tournament.running_tournament = true
+
+	-- Update HUDs
+	pvpplus.tournament_hud_update_all()
 end
 
 function pvpplus.start_global_tournament(starter_name)
@@ -152,7 +173,7 @@ function pvpplus.stop_tournament()
 		return false
 	end
 
-	minetest.chat_send_all("END OF TOURNAMENT!")
+	pvpplus.chat_send_tournament("END OF TOURNAMENT!", true)
 
 	-- Calculate rating
 	local rating = {}
@@ -220,7 +241,7 @@ function pvpplus.stop_tournament()
 	end
 	str = str .. "\n+--------------+-------+--------+---------------+-------------------+-------+"
 
-	minetest.chat_send_all(str)
+	pvpplus.chat_send_tournament(str, true)
 
 	local formspec = "size[10,8.5]textarea[0.5,0.5;9.5,8;ranking;Ranking;"..str.."]button_exit[4,7.5;2,1;exit;Ok]"
 	for name, _ in pairs(tournament.sent_damages) do
@@ -239,6 +260,7 @@ function pvpplus.stop_tournament()
 		kills = {},
 		sound_handles = {},
 		starting_infos = {starter = nil, open_time = nil, start_time = nil, initially_engaged_players = nil},
+		broadcast_messages = false,
 	}
 
 	-- Change the player transfer distance back
@@ -288,7 +310,7 @@ function pvpplus.remove_from_tournament(player_name)
 	if minetest.get_player_by_name(player_name) then
 		minetest.chat_send_player(player_name, "You are no longer playing the tournament.")
 	end
-	minetest.chat_send_all("Player "..player_name.." is no longer playing the tournament.")
+	pvpplus.chat_send_tournament("Player "..player_name.." is no longer playing the tournament.")
 
 	-- Change their PvP state
 	pvpplus.pvp_set(player_name, tournament.previous_pvp_states[player_name])
@@ -323,7 +345,7 @@ function pvpplus.add_to_tournament(player_name)
 
 	-- Send a chat message
 	minetest.chat_send_player(player_name, "You joined the current tournament!")
-	minetest.chat_send_all("Player "..player_name.." joined the current tournament!")
+	pvpplus.chat_send_tournament("Player "..player_name.." joined the current tournament!")
 
 	pvpplus.tournament_hud_update_all()
 end

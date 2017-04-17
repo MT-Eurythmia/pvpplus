@@ -32,6 +32,9 @@ minetest.register_chatcommand("stop_tournament", {
 	description = "Stops the current PvP tournament",
 	privs = {interact = true},
 	func = function(name, param)
+		if not pvpplus.is_running_tournament() then
+			return false, "There is no currently running tournament."
+		end
 		if not check_permission(name) then
 			return false, "You have no permission to stop this tournament."
 		end
@@ -45,11 +48,14 @@ minetest.register_chatcommand("remove_from_tournament", {
 	description = "Removes a player from a PvP tournament",
 	privs = {interact = true},
 	func = function(name, param)
+		if not pvpplus.is_playing_tournament(name) then
+			return false, "Player " .. name .. " is not currently playing a tournament."
+		end
 		if not check_permission(name) then
 			return false, "You have no permission to remove a player from this tournament."
 		end
 		if not minetest.get_player_by_name(param) then
-			return false, "Player does not exist. Please refer to usage: /help kick_from_tournament"
+			return false, "Player does not exist. Please refer to usage: /help remove_from_tournament"
 		end
 		minetest.chat_send_player(param, "You have been removed from the tournament by " .. name)
 		pvpplus.remove_from_tournament(param)
@@ -59,13 +65,10 @@ minetest.register_chatcommand("remove_from_tournament", {
 minetest.register_chatcommand("add_to_tournament", {
 	params = "<name>",
 	description = "Adds a player to the current tournament",
-	privs = {interact = true},
+	privs = {interact = true, tournament_mod = true},
 	func = function(name, param)
-		if not check_permission(name) then
-			return false, "You have no permission to add a player to this tournament."
-		end
 		if not minetest.get_player_by_name(param) then
-			return false, "Player does not exist. Please refer to usage: /help kick_from_tournament"
+			return false, "Player does not exist. Please refer to usage: /help add_from_tournament"
 		end
 		if pvpplus.is_playing_tournament(player) then
 			return false, "Player is already playing a tournament."

@@ -147,6 +147,29 @@ minetest.register_chatcommand("tournament_info", {
 	end
 })
 
+minetest.register_chatcommand("tournament_music_toggle", {
+	params = "",
+	description = "Toggles the music loop",
+	privs = {},
+	func = function(name, param)
+		if not pvpplus.is_playing_tournament(name) then
+			return false, "You are not currently playing a tournament. If you're hearing the tournament music, then it's a bug, please contact a moderator."
+		end
+		if tournament.sound_handles[name] then
+			minetest.sound_stop(tournament.sound_handles[name])
+			tournament.sound_handles[name] = nil
+			return true, "Stopped music loop."
+		else
+			tournament.sound_handles[name] = minetest.sound_play("pvpplus_tournament_loop", {
+				to_player = name,
+				gain = 1.0,
+				loop = true,
+			})
+			return true, "Started music loop."
+		end
+	end
+})
+
 --- /tournament command ---
 
 -- value: {[bool: whether the parameter requires the tournament_mod privilege], [string: type of the wanted value (number or string), nil if no value]}

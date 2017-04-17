@@ -191,10 +191,13 @@ local function parse_params(param)
 		if not param_list[param] then
 			return false, "Invalid option: " .. param
 		end
-		if val and not param_list[param][1] then
+		if param_list[param][1] and not minetest.get_player_privs(name).tournament_mod then
+			return false, "Option " .. param .. " requires the tournament_mod privilege."
+		end
+		if val and not param_list[param][2] then
 			return false, "Option " .. param .. " should not be used with a value."
 		end
-		if not val and param_list[param][1] then
+		if not val and param_list[param][2] then
 			return false, "Option " .. param .. " expects a value (e.g. option=value)."
 		end
 		if param_list[param][2] == "number" and tonumber(val) == nil then

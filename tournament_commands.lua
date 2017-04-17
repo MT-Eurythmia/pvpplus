@@ -175,7 +175,7 @@ minetest.register_chatcommand("tournament_music_toggle", {
 -- value: {[bool: whether the parameter requires the tournament_mod privilege], [string: type of the wanted value (number or string), nil if no value]}
 local param_list = {
 	noteleport = {false, nil},
-	start_delay = {true, "number"}
+	start_delay = {false, "number"}
 }
 
 local function parse_params(param)

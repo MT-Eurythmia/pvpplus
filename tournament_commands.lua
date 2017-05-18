@@ -120,7 +120,8 @@ minetest.register_chatcommand("tournament_info", {
 			            "\nThe tournament will start in: " .. os.difftime(tournament.starting_infos.start_time, os.time()) .. " seconds\n" ..
 				    "The tournament is open since: " .. os.date("%c", tournament.starting_infos.open_time) ..
 				    (tournament.engagement_position and "\nEngaged players will be teleported before the tournament starts.\n" or "\nEngaged players won't be teleported.\n") ..
-				    "Currently engaged players are: "
+				    (tournament.damage_motionless and "Motionless players will be automatically damaged." or "Motionless players won't be damaged.") ..
+				    "\nCurrently engaged players are: "
 			for player, _ in pairs(tournament.engaged_players) do
 				str = str .. player .. ", "
 			end
@@ -131,6 +132,7 @@ minetest.register_chatcommand("tournament_info", {
 			local str = "There is a currrently running tournament.\n" ..
 			            "The tournament was open by: " .. tournament.starting_infos.starter ..
 			            "\nThe tournament is running since: " .. os.date("%c", tournament.starting_infos.start_time) ..
+				    (tournament.damage_motionless and "\nMotionless players are automatically damaged." or "\nMotionless players are not damaged.") ..
 				    "\nInitially engaged players were: "
 			for player, _ in pairs(tournament.starting_infos.initially_engaged_players) do
 				str = str .. player .. ", "
@@ -180,6 +182,7 @@ local param_list = {
 	noteleport = {false, nil},
 	start_delay = {false, "number"},
 	broadcast = {true, nil},
+	damage_motionless = {false, nil},
 }
 
 local function parse_params(param, name)
@@ -241,6 +244,7 @@ minetest.register_chatcommand("tournament", {
 		end
 		local teleport = params.noteleport ~= true
 		tournament.broadcast_messages = params.broadcast or false
+		tournament.damage_motionless = params.damage_motionless or false
 
 		-- Fill start infos
 		tournament.starting_infos.starter = name

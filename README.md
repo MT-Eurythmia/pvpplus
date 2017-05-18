@@ -44,6 +44,7 @@ pvpplus.teleport_engaged_players() -- Teleport engaged players to the tournament
 pvpplus.remove_from_tournament(player_name) -- Remove a player from the current tournament
 pvpplus.add_to_tournament(player_name) -- Add a player to the current tournament
 pvpplus.is_playing_tournament(player_name) -- Is this player playing in the current tournament ?
+pvpplus.get_tournament_players() -- Return tournament players, engaged players or nil, depending on the tournament state
 pvpplus.is_running_tournament() -- Is there a tournament currently running ?
 pvpplus.get_score(player_name) -- Returns the player current score
 

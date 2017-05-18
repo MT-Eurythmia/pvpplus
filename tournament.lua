@@ -14,6 +14,8 @@ pvpplus.tournament = {
 	sound_handles = {},
 	starting_infos = {starter = nil, open_time = nil, start_time = nil, initially_engaged_players = nil},
 	broadcast_messages = false,
+	damage_motionless = false,
+	motion_table = {},
 }
 
 local tournament = pvpplus.tournament -- Shortcut reference
@@ -115,6 +117,7 @@ function pvpplus.start_tournament()
 		tournament.sent_damages[player] = 0
 		tournament.received_damages[player] = 0
 		tournament.kills[player] = 0
+		tournament.motion_table[player] = {pos = minetest.get_player_by_name(player):get_pos(), time = os.time()}
 
 		chat_message = chat_message .. player .. ", "
 
@@ -261,6 +264,8 @@ function pvpplus.stop_tournament()
 		sound_handles = {},
 		starting_infos = {starter = nil, open_time = nil, start_time = nil, initially_engaged_players = nil},
 		broadcast_messages = false,
+		damage_motionless = false,
+		motion_table = {},
 	}
 
 	-- Change the player transfer distance back
@@ -339,6 +344,7 @@ function pvpplus.add_to_tournament(player_name)
 	tournament.received_damages[player_name] = 0
 	tournament.kills[player_name] = 0
 	tournament.previous_pvp_states[player_name] = pvpplus.is_pvp(player_name)
+	tournament.motion_table[player] = {pos = minetest.get_player_by_name(player):get_pos(), time = os.time()}
 
 	-- Enable PvP
 	pvpplus.pvp_enable(player_name)
@@ -356,6 +362,23 @@ function pvpplus.is_playing_tournament(player_name)
 	else
 		return false
 	end
+end
+
+function pvpplus.get_tournament_players()
+	local t = {}
+	if pvpplus.is_running_tournament() then
+		for name, _ in pairs(tournament.players) do
+			table.insert(t, minetest.get_player_by_name(name))
+		end
+	elseif pvpplus.is_engaging_players() then
+		for name, _ in pairs(tournament.engaged_players) do
+			table.insert(t, minetest.get_player_by_name(name))
+		end
+	else
+		t = nil
+	end
+
+	return t
 end
 
 function pvpplus.is_running_tournament()
@@ -417,3 +440,4 @@ end)
 
 dofile(minetest.get_modpath(minetest.get_current_modname()).."/tournament_commands.lua")
 dofile(minetest.get_modpath(minetest.get_current_modname()).."/tournament_hud.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()).."/tournament_motionless.lua")

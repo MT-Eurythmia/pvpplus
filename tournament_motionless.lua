@@ -9,7 +9,6 @@ minetest.register_globalstep(function(dtime)
 	for _, player in ipairs(pvpplus.get_tournament_players()) do
 		local pos = vector.round(player:get_pos())
 		local table_entry = pvpplus.tournament.motion_table[player:get_player_name()]
-		print(dump(table_entry))
 		if vector.equals(pos, table_entry.pos) then
 			if os.difftime(os.time(), table_entry.time) > MAX_TIME_MOTIONLESS then
 				minetest.chat_send_player(player:get_player_name(), "Move!")

@@ -11,14 +11,13 @@ function pvpplus.tournament_hud_update_list()
 	tournament.hud_list = {}
 
 	for name, _ in pairs(tournament.sent_damages) do
-		if not pvpplus.get_score(name) then
-			return pvpplus.get_score(name)
+		if pvpplus.get_score(name) then
+			table.insert(tournament.hud_list, {
+				name = name,
+				score = pvpplus.get_score(name),
+				status = pvpplus.is_playing_tournament(name)
+			})
 		end
-		table.insert(tournament.hud_list, {
-			name = name,
-			score = pvpplus.get_score(name),
-			status = pvpplus.is_playing_tournament(name)
-		})
 	end
 
 	table.sort(tournament.hud_list, function(a, b) return a.score > b.score end)

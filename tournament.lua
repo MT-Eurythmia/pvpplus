@@ -60,6 +60,9 @@ function pvpplus.get_score(name)
 	if not pvpplus.is_running_tournament() then
 		return false, "There is no running tournament."
 	end
+	if not pvpplus.is_playing_tournament(name) then
+		return false, "Player " .. name .. "is not currently playing a tournament."
+	end
 	return tournament.sent_damages[name] - tournament.received_damages[name] + tournament.kills[name] * 20
 end
 

@@ -85,7 +85,7 @@ if minetest.get_modpath("unified_inventory") then
 		type = "image",
 		image = "pvp.png",
 		action = function(player)
-			pvpplus.pvp_toggle(player_name)
+			pvpplus.pvp_toggle(player:get_player_name())
 		end
 	})
 end

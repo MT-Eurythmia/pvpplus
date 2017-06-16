@@ -56,7 +56,6 @@ pvpplus.tournament_hud_update_all() -- Update the list and all player HUDs
 
 ## TODO
 
-* Add a privilege for changing PvP state
 * Add a formspec for managing tournaments, accessible from the inventory
 * Testing
 

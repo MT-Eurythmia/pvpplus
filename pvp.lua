@@ -1,3 +1,5 @@
+minetest.register_privilege("pvp", "Can configure own PvP setting")
+
 -- Private table
 local pvptable = {}
 
@@ -84,6 +86,14 @@ if minetest.get_modpath("unified_inventory") then
 	unified_inventory.register_button("pvp", {
 		type = "image",
 		image = "pvp.png",
+		condition = function(player)
+			return minetest.check_player_privs(
+				player:get_player_name(),
+				{
+					pvp = true
+				}
+			)
+		end,
 		action = function(player)
 			pvpplus.pvp_toggle(player:get_player_name())
 		end
@@ -93,7 +103,9 @@ end
 minetest.register_chatcommand("pvp_enable", {
 	params = "",
 	description = "Enables PvP",
-	privs = {},
+	privs = {
+		pvp = true
+	},
 	func = function(name, param)
 		if pvpplus.is_pvp(name) then
 			return false, "Your PvP is already enabled."
@@ -104,7 +116,9 @@ minetest.register_chatcommand("pvp_enable", {
 minetest.register_chatcommand("pvp_disable", {
 	params = "",
 	description = "Disables PvP",
-	privs = {},
+	privs = {
+		pvp = true
+	},
 	func = function(name, param)
 		if not pvpplus.is_pvp(name) then
 			return false, "Your PvP is already disabled."

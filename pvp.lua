@@ -4,21 +4,36 @@ local pvptable = {}
 -- Public table, containing global functions
 pvpplus = {}
 
+local S
+
+if minetest.get_modpath(
+	"intllib"
+) then
+	S = intllib.Getter(
+	)
+else
+	S = function(
+		translated
+	)
+		return translated
+	end
+end
+
 function pvpplus.pvp_set(player_name, state)
 	if pvpplus.is_playing_tournament(player_name) then
-		return false, "PvP state cannot be changed while playing a tournament."
+		return false, S("PvP state cannot be changed while playing a tournament.")
 	end
 	if type(state) ~= "boolean" then
-		return false, "The state parameter has to be a boolean."
+		return false, S("The state parameter has to be a boolean.")
 	end
 
 	local player = minetest.get_player_by_name(player_name)
 	if not player then
-		return false, "Player " .. player_name .. " does not exist or is not currently connected."
+		return false, string.format(S("Player %s does not exist or is not currently connected."), player_name)
 	end
 	pvptable[player_name].state = state
 
-	minetest.chat_send_player(player_name, "Your PvP has been " .. ((state and "enabled") or "disabled"))
+	minetest.chat_send_player(player_name, ((state and S("Your PvP has been enabled")) or S("Your PvP has been disabled")))
 
 	player:hud_remove((state and pvptable[player_name].pvpdisabled) or pvptable[player_name].pvpenabled)
 	player:hud_remove((state and pvptable[player_name].nopvppic) or pvptable[player_name].pvppic)
@@ -29,7 +44,7 @@ function pvpplus.pvp_set(player_name, state)
 			position = {x = 1, y = 0},
 			offset = {x=-125, y = 20},
 			scale = {x = 100, y = 100},
-			text = "PvP is enabled for you!",
+			text = S("PvP is enabled for you!"),
 			number = 0xFF0000 -- Red
 		})
 		pvptable[player_name].pvppic = player:hud_add({
@@ -45,7 +60,7 @@ function pvpplus.pvp_set(player_name, state)
 			position = {x = 1, y = 0},
 			offset = {x=-125, y = 20},
 			scale = {x = 100, y = 100},
-			text = "PvP is disabled for you!",
+			text = S("PvP is disabled for you!"),
 			number = 0x7DC435
 		})
 		pvptable[player_name].nopvppic = player:hud_add({
@@ -84,6 +99,7 @@ if minetest.get_modpath("unified_inventory") then
 	unified_inventory.register_button("pvp", {
 		type = "image",
 		image = "pvp.png",
+		tooltip = "PvP",
 		action = function(player)
 			pvpplus.pvp_toggle(player:get_player_name())
 		end
@@ -92,22 +108,22 @@ end
 
 minetest.register_chatcommand("pvp_enable", {
 	params = "",
-	description = "Enables PvP",
+	description = S("Enables PvP"),
 	privs = {},
 	func = function(name, param)
 		if pvpplus.is_pvp(name) then
-			return false, "Your PvP is already enabled."
+			return false, S("Your PvP is already enabled.")
 		end
 		return pvpplus.pvp_enable(name)
 	end
 })
 minetest.register_chatcommand("pvp_disable", {
 	params = "",
-	description = "Disables PvP",
+	description = S("Disables PvP"),
 	privs = {},
 	func = function(name, param)
 		if not pvpplus.is_pvp(name) then
-			return false, "Your PvP is already disabled."
+			return false, S("Your PvP is already disabled.")
 		end
 		return pvpplus.pvp_disable(name)
 	end
@@ -138,7 +154,7 @@ minetest.register_on_joinplayer(function(player)
 		position = {x = 1, y = 0},
 		offset = {x=-125, y = 20},
 		scale = {x = 100, y = 100},
-		text = "PvP is disabled for you!",
+		text = S("PvP is disabled for you!"),
 		number = 0x7DC435
 	})
 end)
@@ -154,11 +170,11 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	local hittername = hitter:get_player_name()
 
 	if not pvptable[localname].state then
-		minetest.chat_send_player(hittername, "You can't hit "..localname.." because their PvP is disabled.")
+		minetest.chat_send_player(hittername, string.format(S("You can't hit %s because their PvP is disabled."), localname))
 		return true
 	end
 	if not pvptable[hittername].state then
-		minetest.chat_send_player(hittername, "You can't hit "..localname.." because your PvP is disabled.")
+		minetest.chat_send_player(hittername, string.format(S("You can't hit %s because your PvP is disabled."), localname))
 		return true
 	end
 	return false

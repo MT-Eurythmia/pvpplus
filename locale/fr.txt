@@ -1,0 +1,14 @@
+### pvp.lua
+PvP state cannot be changed while playing a tournament. = L'état du PvP ne peut pas être modifié pendant un tournoi.
+The state parameter has to be a boolean. = Le paramètre 'état' doit être un booléen.
+Player %s does not exist or is not currently connected. = Le joueur %s n'existe pas ou n'est pas actuellement connecté.
+Your PvP has been enabled = Votre PvP a été activé
+Your PvP has been disabled = Votre PvP a été désactivé
+PvP is enabled for you! = Votre PvP est activé !
+PvP is disabled for you! = Votre PvP est désactivé !
+Enables PvP = Active le PvP
+Your PvP is already enabled. = Votre PvP est déjà activé.
+Disables PvP = Désactive le PvP
+Your PvP is already disabled. = Votre PvP est déjà désactivé.
+You can't hit %s because their PvP is disabled. = Vous ne pouvez pas frapper %s car son PvP est désactivé.
+You can't hit %s because your PvP is disabled. = Vous ne pouvez pas frapper %s car votre PvP est désactivé.

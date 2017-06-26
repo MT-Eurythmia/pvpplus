@@ -21,6 +21,7 @@ Some additional commands are only executable by the players possessing the `tour
 ## Settings
 
 * `pvpplus.enable_sound_loop = true`: whether to play a looped epic music during the tournament
+* `pvpplus.default_pvp_state = false`: PvP state given to players when they join the game
 
 ## API
 

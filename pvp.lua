@@ -149,7 +149,7 @@ pvpplus.tournament_on_punchplayer = nil
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
-	pvptable[name] = {state = false}
+	pvptable[name] = {state = minetest.settings:get_bool("pvpplus.default_pvp_state") or false}
 	pvptable[name].nopvppic = player:hud_add({
 		hud_elem_type = "image",
 		position = {x = 1, y = 0},

@@ -129,7 +129,7 @@ function pvpplus.start_tournament()
 			to_player = player,
 			gain = 1.0,
 		})
-		if minetest.setting_getbool("pvpplus.enable_sound_loop") ~= false then -- If it's true or nil (unset)
+		if minetest.settings:get_bool("pvpplus.enable_sound_loop") ~= false then -- If it's true or nil (unset)
 			minetest.after(10, function(name)
 				tournament.sound_handles[name] = minetest.sound_play("pvpplus_tournament_loop", {
 					to_player = name,
@@ -145,8 +145,8 @@ function pvpplus.start_tournament()
 	tournament.teleport_immediately = false
 
 	-- Set the player transfer distance
-	previous_player_transfer_distance = minetest.setting_get("player_transfer_distance")
-	minetest.setting_set("player_transfer_distance", 0) -- 0 = unlimited
+	previous_player_transfer_distance = minetest.settings:get("player_transfer_distance")
+	minetest.settings:set("player_transfer_distance", 0) -- 0 = unlimited
 
 	-- Send the final chat message
 	pvpplus.chat_send_tournament(chat_message, true)
@@ -272,7 +272,7 @@ function pvpplus.stop_tournament()
 	}
 
 	-- Change the player transfer distance back
-	minetest.setting_set("player_transfer_distance", previous_player_transfer_distance)
+	minetest.settings:set("player_transfer_distance", previous_player_transfer_distance)
 end
 
 function pvpplus.allow_engaging(starter_name, teleport)

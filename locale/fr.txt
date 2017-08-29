@@ -12,3 +12,6 @@ Disables PvP = Désactive le PvP
 Your PvP is already disabled. = Votre PvP est déjà désactivé.
 You can't hit %s because their PvP is disabled. = Vous ne pouvez pas frapper %s car son PvP est désactivé.
 You can't hit %s because your PvP is disabled. = Vous ne pouvez pas frapper %s car votre PvP est désactivé.
+Can change own PvP state = Peut changer l'état de son propre PvP
+Can change others PvP state = Peut changer l'état du PvP des autres joueurs
+You cannot change other players PvP state unless you have the pvp_admin privilege. = Vous ne pouvez pas changer l'état du PvP des autres joueurs à moins de posséder le privilège pvp_admin.

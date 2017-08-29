@@ -12,3 +12,6 @@ Disables PvP =
 Your PvP is already disabled. =
 You can't hit %s because their PvP is disabled. =
 You can't hit %s because your PvP is disabled. =
+Can change own PvP state =
+Can change others PvP state =
+You cannot change other players PvP state unless you have the pvp_admin privilege. =

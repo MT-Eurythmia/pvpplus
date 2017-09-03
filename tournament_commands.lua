@@ -101,7 +101,7 @@ minetest.register_chatcommand("engage", {
 		if pvpplus.is_playing_tournament(name) then
 			return false, "You are already playing a tournament."
 		end
-		if not tournament.engaging_players then
+		if not pvpplus.is_engaging_players() then
 			return false, "There is no opened tournament. Type /tournament!"
 		end
 		pvpplus.engage_player(name)

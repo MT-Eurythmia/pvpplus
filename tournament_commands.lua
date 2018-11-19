@@ -1,4 +1,4 @@
-local tournament_starting_time = tonumber(minetest:settings:get("pvpplus.tournament_starting_time")) or 60 -- seconds
+local tournament_starting_time = tonumber(minetest.settings:get("pvpplus.tournament_starting_time")) or 60 -- seconds
 local tournament = pvpplus.tournament -- Shortcut reference
 
 minetest.register_privilege("tournament_mod", "PvP Tournament Moderator")

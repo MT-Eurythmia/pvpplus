@@ -3,7 +3,7 @@ tournament.hud = {}
 tournament.hud_list = {}
 
 -- These values cannot be exact for all clients. Default values should be fine for most of them.
-local margin = tonumber(minetest.setting_get("pvpplus.tournament_hud_margin")) or 10 -- pixels
+local margin = tonumber(minetest.settings:get("pvpplus.tournament_hud_margin")) or 10 -- pixels
 local font_width = tonumber(minetest.settings:get("pvpplus.font_width")) or 5 -- pixels
 local separation = tonumber(minetest.settings:get("pvpplus.tournament_hud_separation")) or 18 -- pixels
 

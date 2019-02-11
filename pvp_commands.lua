@@ -1,11 +1,8 @@
-local S
-if minetest.get_modpath("intllib") then
-	S = intllib.Getter()
-else
-	S = function(translated)
-		return translated
-	end
-end
+local MP = minetest.get_modpath(minetest.get_current_modname())
+
+local S, NS = dofile(
+    MP .. "/intllib.lua"
+)
 
 if minetest.get_modpath("unified_inventory") then
 	unified_inventory.register_button("pvp", {

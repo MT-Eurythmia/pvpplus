@@ -4,14 +4,11 @@ local pvptable = {}
 -- Public table, containing global functions
 pvpplus = {}
 
-local S
-if minetest.get_modpath("intllib") then
-	S = intllib.Getter()
-else
-	S = function(translated)
-		return translated
-	end
-end
+local MP = minetest.get_modpath(minetest.get_current_modname())
+
+local S, NS = dofile(
+    MP .. "/intllib.lua"
+)
 
 minetest.register_privilege("pvp", S("Can change own PvP state"))
 minetest.register_privilege("pvp_admin", S("Can change others PvP state"))

@@ -134,6 +134,10 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	local localname = player:get_player_name()
 	local hittername = hitter:get_player_name()
 
+	if localname == hittername then
+		return false
+	end
+
 	if not pvptable[localname].state then
 		minetest.chat_send_player(hittername, string.format(S("You can't hit %s because their PvP is disabled."), localname))
 		return true

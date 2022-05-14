@@ -148,3 +148,11 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	end
 	return false
 end)
+
+local old_calculate_knockback = minetest.calculate_knockback
+function minetest.calculate_knockback(player, hitter, ...)
+	if not pvpplus.is_pvp(player:get_player_name()) or not pvpplus.is_pvp(hitter:get_player_name()) then
+		return 0
+	end
+	return old_calculate_knockback(player, hitter, ...)
+end
